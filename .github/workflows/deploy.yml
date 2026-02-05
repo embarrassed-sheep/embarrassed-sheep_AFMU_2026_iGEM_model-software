@@ -2,7 +2,7 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: [ main ]  # 确保这里是你仓库的分支名，可能是 main 或 master
+    branches: [ main ]
 
 permissions:
   contents: read
@@ -16,21 +16,29 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # 步骤1: 安装 pnpm (这是关键！解决报错的核心)
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
       - name: Install Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: 'pnpm'
 
+      # 步骤2: 使用 pnpm 安装依赖 (精准匹配 Manus 的环境)
       - name: Install Dependencies
-        run: npm install
+        run: pnpm install
 
+      # 步骤3: 暴力构建 (pnpm exec 会自动找到 vite 并运行，且跳过 TS 检查)
       - name: Build
-        run: npm vite build
+        run: pnpm exec vite build
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./dist # Vite 默认编译输出目录是 dist
+          path: ./dist
 
   deploy:
     environment:
