@@ -16,24 +16,18 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # 步骤1: 安装 pnpm (这是关键！解决报错的核心)
-      - uses: pnpm/action-setup@v3
-        with:
-          version: 9
-
       - name: Install Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'pnpm'
 
-      # 步骤2: 使用 pnpm 安装依赖 (精准匹配 Manus 的环境)
+      # 关键修改：删除了 pnpm 锁文件后，直接用 npm 安装，兼容性最好
       - name: Install Dependencies
-        run: pnpm install
+        run: npm install
 
-      # 步骤3: 暴力构建 (pnpm exec 会自动找到 vite 并运行，且跳过 TS 检查)
+      # 关键修改：使用 npx vite build，它是最暴力的构建方式
       - name: Build
-        run: pnpm exec vite build
+        run: npx vite build
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
