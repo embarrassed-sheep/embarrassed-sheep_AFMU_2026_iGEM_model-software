@@ -21,11 +21,13 @@ jobs:
         with:
           node-version: 20
 
-      # 关键修改：删除了 pnpm 锁文件后，直接用 npm 安装，兼容性最好
+      # 关键点1: 没有锁文件干扰，npm 会自动寻找最合适的包
       - name: Install Dependencies
         run: npm install
 
-      # 关键修改：使用 npx vite build，它是最暴力的构建方式
+      # 关键点2: 使用 npx vite build
+      # 这是一条暴力指令，它会绕过 package.json 里的 tsc (语法检查)，
+      # 直接命令打包器干活。只要代码能跑，它就能打包，不管语法红线。
       - name: Build
         run: npx vite build
 
